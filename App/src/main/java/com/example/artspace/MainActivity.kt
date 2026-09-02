@@ -17,7 +17,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -93,24 +96,81 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArtistPage(navController: NavController) {
-val id = navController.currentBackStackEntry?.arguments?.getInt("id") ?: 0
+    val id = navController.currentBackStackEntry?.arguments?.getInt("id") ?: 0
 
-val art = DataSource.arts[id]
+    val art = DataSource.arts[id]
 
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text(text = stringResource(id = art.artistId)) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Artist portrait
+            Image(
+                painter = painterResource(id = art.artistImageId),
+                contentDescription = stringResource(id = art.artistId),
+                modifier = Modifier
+                    .size(140.dp)
+                    .clip(CircleShape)
+            )
 
+            Spacer(modifier = Modifier.height(12.dp))
 
+            // Artist name
+            Text(
+                text = stringResource(id = art.artistId),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
 
+            Spacer(modifier = Modifier.height(4.dp))
 
+            // Nationality and lifespan
+            Text(
+                text = stringResource(id = art.artistInfoId),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.secondary
+            )
 
+            Spacer(modifier = Modifier.height(16.dp))
 
-    Button(onClick = { navController.navigate(Screen.Home.route + "/$id")}) {
-        Text(text = stringResource(id = R.string.back))
+            // Full artist biography
+            Text(
+                text = stringResource(id = art.artistBioId),
+                style = MaterialTheme.typography.bodyLarge
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(onClick = { navController.navigate(Screen.Home.route + "/$id") }) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowLeft,
+                    contentDescription = null
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(text = stringResource(id = R.string.back))
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+        }
     }
-    Text(text = "Artist Page")
-
-
 }
 
 
